@@ -20,6 +20,8 @@ def rad2deg(rad: float) -> float:
 # ######################
 
 show_caps = True
+create_side_nubs = True
+create_top_nubs = True
 
 nrows = 5  # key rows
 ncols = 6  # key columns
@@ -190,13 +192,14 @@ plate_thickness = 4
 mount_width = keyswitch_width + 3
 mount_height = keyswitch_height + 3
 mount_thickness = plate_thickness
+retention_tab_thickness = 1.5
+retention_tab_hole_thickness = plate_thickness - retention_tab_thickness
 
 SWITCH_WIDTH = 14
 SWITCH_HEIGHT = 14
 CLIP_THICKNESS = 1.4
 CLIP_UNDERCUT = 1.0
 UNDERCUT_TRANSITION = .2
-
 
 def single_plate(cylinder_segments=100):
     top_wall = cq.Workplane("XY").box(keyswitch_width + 3, 1.5, plate_thickness)
@@ -212,10 +215,20 @@ def single_plate(cylinder_segments=100):
     nub_cube = cq.Workplane("XY").box(1.5, 2.75, plate_thickness)
     nub_cube = nub_cube.translate(((1.5 / 2) + (keyswitch_width / 2), 0, plate_thickness / 2))
 
+    top_nub  = cq.Workplane("XY").box(5,5,retention_tab_hole_thickness)
+    top_nub  = top_nub.translate((0, keyswitch_width / 2 -1.5, retention_tab_hole_thickness/2))
+
+    #(translate [(+ (/ keyswitch-width 2.5)) 0 retention_tab_hole_thickness/2 - 0.5)
+
     side_nub2 = tess_hull(shapes=(side_nub, nub_cube))
     side_nub2 = side_nub2.union(side_nub).union(nub_cube)
-
-    plate_half1 = top_wall.union(left_wall).union(side_nub2)
+    if create_side_nubs:
+        plate_half1 = top_wall.union(left_wall).union(side_nub2)
+    else: plate_half1 = top_wall.union(left_wall)
+    
+    if create_top_nubs:
+        plate_half1 = plate_half1.cut(top_nub)
+    
     plate_half2 = plate_half1
     plate_half2 = mirror(plate_half2, 'XZ')
     plate_half2 = mirror(plate_half2, 'YZ')
@@ -1457,9 +1470,9 @@ def model_right():
     s2 = s2.cut(usb_holder_hole())
     s2 = s2.cut(union(screw_insert_holes))
 
-    shape = shape.union(rj9_holder())
+    #shape = shape.union(rj9_holder())
     shape = shape.union(s2, tol=.01)
-    # shape = shape.union(wire_posts())
+     shape = shape.union(wire_posts())
     block = cq.Workplane("XY").box(350, 350, 40)
     block = block.translate((0, 0, -20))
     shape = shape.cut(block)
