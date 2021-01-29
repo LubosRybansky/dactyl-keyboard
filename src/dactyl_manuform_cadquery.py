@@ -1203,7 +1203,7 @@ def case_walls():
         ])
     )
 
-
+"""
 rj9_start = list(
     np.array([0, -3, 0])
     + np.array(
@@ -1275,7 +1275,7 @@ def usb_holder_hole():
         )
     )
     return shape
-
+"""
 
 teensy_width = 20
 teensy_height = 12
@@ -1464,15 +1464,15 @@ def model_right():
     s2 = cq.Workplane('XY').union(case_walls())
     s2 = union([s2, *screw_insert_outers])
     # s2 = s2.union(teensy_holder())
-    s2 = s2.union(usb_holder())
+    #s2 = s2.union(usb_holder())
 
-    s2 = s2.cut(rj9_space())
-    s2 = s2.cut(usb_holder_hole())
-    s2 = s2.cut(union(screw_insert_holes))
+    #s2 = s2.cut(rj9_space())
+    #s2 = s2.cut(usb_holder_hole())
+    #s2 = s2.cut(union(screw_insert_holes))
 
     #shape = shape.union(rj9_holder())
     shape = shape.union(s2, tol=.01)
-     shape = shape.union(wire_posts())
+    # shape = shape.union(wire_posts())
     block = cq.Workplane("XY").box(350, 350, 40)
     block = block.translate((0, 0, -20))
     shape = shape.cut(block)
